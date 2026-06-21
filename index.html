@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedCid Planner - 5º Período</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">MedCid Planner · 5º Período</p>
+      <h1>Plano de Estudos Interativo</h1>
+      <p>Crie seu horário semanal, programe revisões automáticas, acompanhe avanço, priorize por Pareto e entre em modo pré-prova quando precisar.</p>
+      <div class="quick-actions">
+        <button id="darkToggle" class="btn secondary">🌙 Modo escuro</button>
+        <button id="examMode" class="btn warning">🔥 Modo pré-prova</button>
+        <button id="resetData" class="btn danger">Resetar dados</button>
+      </div>
+    </div>
+    <aside class="level-card">
+      <span>Nível atual</span>
+      <strong id="level">1</strong>
+      <small><span id="xp">0</span> XP acumulados</small>
+      <div class="progress big"><span id="xpBar"></span></div>
+    </aside>
+  </header>
+
+  <nav class="tabs" aria-label="Abas do sistema">
+    <button class="tab active" data-tab="inicio">Início</button>
+    <button class="tab" data-tab="horario">Horário</button>
+    <button class="tab" data-tab="disciplinas">Disciplinas</button>
+    <button class="tab" data-tab="pareto">Pareto</button>
+    <button class="tab" data-tab="revisoes">Revisões</button>
+    <button class="tab" data-tab="campanha">Campanha</button>
+    <button class="tab" data-tab="questoes">Questões</button>
+    <button class="tab" data-tab="progresso">Progresso</button>
+  </nav>
+
+  <main>
+    <section id="inicio" class="panel active">
+      <div class="dashboard">
+        <article class="metric"><span>Horas/semana</span><strong id="weeklyHours">0h</strong><small>blocos cadastrados</small></article>
+        <article class="metric"><span>Revisões hoje</span><strong id="todayReviewsCount">0</strong><small>pendentes para hoje</small></article>
+        <article class="metric danger-metric"><span>Atrasadas</span><strong id="lateReviewsCount">0</strong><small>precisam de resgate</small></article>
+        <article class="metric"><span>Progresso geral</span><strong id="overallProgress">0%</strong><small>revisões, tarefas e questões</small></article>
+      </div>
+
+      <div class="grid two">
+        <article class="card">
+          <h2>Revisar hoje</h2>
+          <div id="todayList" class="compact-list"></div>
+        </article>
+        <article class="card highlight">
+          <h2>Fluxo ideal</h2>
+          <ol>
+            <li>Cadastre disciplina e assunto.</li>
+            <li>Marque “primeiro contato”.</li>
+            <li>O site gera R1, R2, R3, R4 e R5 automaticamente.</li>
+            <li>Faça questões e registre desempenho.</li>
+            <li>Use o Pareto para decidir o próximo bloco.</li>
+          </ol>
+        </article>
+      </div>
+
+      <article class="card">
+        <h2>Linha de revisão automática</h2>
+        <div class="timeline"><span>Estudei</span><span>D+1</span><span>D+3</span><span>D+7</span><span>D+14</span><span>D+30</span></div>
+      </article>
+    </section>
+
+    <section id="horario" class="panel">
+      <div class="section-head"><div><h2>Horário semanal</h2><p>Modelo inspirado na planilha: DOM a SAB, blocos por hora e local.</p></div><button id="addSchedule" class="btn">+ Adicionar bloco</button></div>
+      <form id="scheduleForm" class="form grid six">
+        <select id="day"><option>DOM</option><option>SEG</option><option>TER</option><option>QUA</option><option>QUI</option><option>SEX</option><option>SAB</option></select>
+        <input id="time" type="time" value="07:00" />
+        <input id="duration" type="number" min="0.5" step="0.5" value="1" title="Duração em horas" />
+        <input id="activity" placeholder="Atividade/Disciplina" />
+        <select id="type"><option>Teoria</option><option>Questões</option><option>Revisão</option><option>Prática</option><option>Simulado</option><option>Livre</option><option>Não estudar</option></select>
+        <input id="place" placeholder="Local" />
+      </form>
+      <div class="table-wrap"><table id="scheduleTable"></table></div>
+    </section>
+
+    <section id="disciplinas" class="panel">
+      <div class="section-head"><div><h2>Disciplinas</h2><p>Controle peso, meta, prova e avanço real.</p></div><button id="addSubject" class="btn">+ Adicionar disciplina</button></div>
+      <form id="subjectForm" class="form grid six">
+        <input id="subjectName" placeholder="Disciplina" />
+        <input id="subjectWeight" type="number" min="1" value="8" placeholder="Peso" />
+        <input id="subjectGoal" type="number" min="1" value="4" placeholder="Horas/semana" />
+        <input id="examDate" type="date" />
+        <select id="subjectMode"><option>AP1</option><option>AP2</option><option>PF</option><option>Residência</option></select>
+        <input id="subjectColor" type="color" value="#7c3aed" />
+      </form>
+      <div id="subjectCards" class="cards"></div>
+    </section>
+
+    <section id="pareto" class="panel">
+      <div class="section-head"><div><h2>Pareto por assunto</h2><p>Classifique cada tópico por temperatura e custo-benefício. O painel recomenda a ordem.</p></div><button id="addTopic" class="btn">+ Adicionar tópico</button></div>
+      <form id="topicForm" class="form grid six">
+        <input id="topicSubject" placeholder="Disciplina" />
+        <input id="topicName" placeholder="Tópico" />
+        <select id="topicTemp"><option>🟥 Muito cobrado</option><option>🟧 Cobrado</option><option>🟨 Ocasional</option><option>🟩 Raro</option></select>
+        <select id="topicDifficulty"><option>Fácil</option><option>Médio</option><option>Difícil</option></select>
+        <select id="topicBenefit"><option>Alto</option><option>Médio</option><option>Baixo</option></select>
+        <button type="button" id="addTopicInline" class="btn secondary">Salvar</button>
+      </form>
+      <div class="table-wrap"><table id="topicTable"></table></div>
+    </section>
+
+    <section id="revisoes" class="panel">
+      <div class="section-head"><div><h2>Revisões automáticas</h2><p>Informe o primeiro contato; o sistema calcula R1, R2, R3, R4 e R5.</p></div><button id="addReview" class="btn">+ Gerar revisão</button></div>
+      <form id="reviewForm" class="form grid five">
+        <input id="reviewSubject" placeholder="Disciplina" />
+        <input id="reviewTopic" placeholder="Assunto/tópico" />
+        <input id="reviewDate" type="date" />
+        <select id="reviewPriority"><option>Alta</option><option>Média</option><option>Baixa</option></select>
+        <select id="reviewKind"><option>Teoria</option><option>Questões</option><option>Mapa mental</option><option>Flashcards</option></select>
+      </form>
+      <div class="filters"><input id="reviewFilter" placeholder="Filtrar por disciplina, tópico ou data" /><button id="todayReviews" class="btn secondary">Hoje</button><button id="lateReviews" class="btn secondary">Atrasadas</button><button id="allReviews" class="btn secondary">Todas</button></div>
+      <div class="table-wrap"><table id="reviewTable"></table></div>
+    </section>
+
+    <section id="campanha" class="panel">
+      <div class="section-head"><div><h2>Mapa de campanha</h2><p>Cada disciplina vira uma trilha. Complete tópicos para desbloquear o chefe.</p></div><button id="buildCampaign" class="btn">Gerar mapa</button></div>
+      <div id="campaignMap" class="campaign"></div>
+    </section>
+
+    <section id="questoes" class="panel">
+      <div class="section-head"><div><h2>Banco de desempenho</h2><p>Registre questões por tópico. O sistema encontra seus pontos fracos.</p></div><button id="addQuestionSession" class="btn">+ Registrar sessão</button></div>
+      <form id="questionForm" class="form grid six">
+        <input id="qSubject" placeholder="Disciplina" />
+        <input id="qTopic" placeholder="Tópico" />
+        <input id="qDone" type="number" min="1" value="10" placeholder="Questões" />
+        <input id="qCorrect" type="number" min="0" value="7" placeholder="Acertos" />
+        <select id="qKind"><option>Prova antiga</option><option>Simulado</option><option>Banco próprio</option><option>Discursiva</option></select>
+        <input id="qDate" type="date" />
+      </form>
+      <div id="weaknessBox" class="cards"></div>
+      <div class="table-wrap"><table id="questionTable"></table></div>
+    </section>
+
+    <section id="progresso" class="panel">
+      <h2>Progresso e tarefas</h2>
+      <form id="taskForm" class="form grid five">
+        <input id="taskTitle" placeholder="Tarefa: ex. 30 questões de RCP" />
+        <input id="taskSubject" placeholder="Disciplina" />
+        <input id="taskDate" type="date" />
+        <select id="taskKind"><option>Teoria</option><option>Questões</option><option>Revisão</option><option>Simulado</option></select>
+        <button type="button" id="addTask" class="btn">+ Tarefa</button>
+      </form>
+      <div id="progressArea" class="progress-area"></div>
+      <h3>Tarefas rápidas</h3>
+      <div id="taskList" class="task-list"></div>
+    </section>
+  </main>
+
+  <template id="emptyState"><div class="empty">Nada cadastrado ainda.</div></template>
+  <script src="script.js"></script>
+</body>
+</html>
